@@ -1,3 +1,4 @@
+BEGIN { print "'Network', 'Channel', 'Nick', 'Pack #', 'DLs', 'Size', 'Type', 'File'" }
 {
     # 1 - nick
     # 2 - number
@@ -31,11 +32,13 @@
     #sql="INSERT INTO packs VALUES('"NETWORK"', '"CHANNEL"', '"$1"', '"$2"', '"$3"', '"$4"', '"FILE"', 'HINT', 'test' );"
     csv="'"NETWORK"', '"CHANNEL"', '"$1"', '"$2"', '"$3"', '"$4"', '"HINT"', '"FILE"'"
     count++
-    print count
+    #print count
 
 
     #print sql | "sqlite3 xdcc.sqlite3"
     #print sql > "wtf.sql"
-    print csv > "wtf.csv"
-
+    #print csv > "wtf.csv"
+    
+    print csv
+    
 }
