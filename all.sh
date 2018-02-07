@@ -14,7 +14,12 @@ BASEPATH=$(realpath `dirname $0`);
 # Verify the log directory exists
 [ ! -d "${LOG_DIR}" ] && echo "Error: could not locate log file directory at ${LOG_DIR}" && exit 1; 
 
-(>&2 echo "Processing all channel_*.log files from ${LOG_DIR}")
+# Gather log file count
+LOG_COUNT=$(find "${LOG_DIR}" -maxdepth 1 -type f -ctime -5 -iname 'channel_*.log' | wc -l);
+
+[ ! "${LOG_COUNT}" -gt 0 ] && echo "Error: no valid, or recently created log files were found. (channel_*.log created within 5 days)" && exit 1; 
+
+(>&2 echo "Processing ${LOG_COUNT} channel log files from ${LOG_DIR}")
 
 process() {
     f="$1"
