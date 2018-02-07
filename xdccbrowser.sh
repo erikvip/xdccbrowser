@@ -39,9 +39,22 @@ main() {
 		shift;
 	done;	
 
+	# Add the header back if it was removed during the search
+	if [ ! -z "${_search_name}" ]; then
+		local _header=$(awk -f "${BASEPATH}/import.awk" < /dev/null); 
+		local _headersum=$(echo "${_header}" | md5sum | cut -d ' ' -f1); 
+		local _checksum=$(head -n1 "${_csv}" | md5sum | cut -d ' ' -f1); 
+
+		if [[ "${_headersum}" != "${_checksum}" ]]; then
+			echo "$_header" > "${_tmp}"; 
+			cat "${_csv}" >> "${_tmp}"; 
+			mv "${_tmp}" "${_csv}"; 
+		fi; 
+
+	fi
+
 	local _hits=$(cat "$_csv" | wc -l); 
 	echo "Search found ${_hits} matches for ${_search_name}"; 
-#	echo $_csv;
 	
 #	echo "Launching tabview browser"; 
 	tabview --width 'mode' "${_csv}"; 
