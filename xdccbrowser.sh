@@ -24,9 +24,9 @@ main() {
 	fi; 
 	
 	echo "Launching tabview browser"; 
-	
 	tabview --width 'mode' "${_csv}"; 
-	
+
+	rm "${_csv}"; 	
 }
 
 setup 

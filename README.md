@@ -51,14 +51,6 @@ After generating the CSV, you can browser it however you want, but I prefer usin
 tabview --width 'mode' xdcc.csv
 ```
 
-#### Tabview keys
-
-<> Increase/decrease all column widths
-,. Increase/decrease selected column width
-Aa Sort by selected column (ascending / descending)
-/  Keyword search
-?  Key reference
-
 #### Hint
 
 After adjusting the column view so it's readable, sort Descending (uppercase A) by DLs, then sort Ascending (lowercase a) by 
