@@ -26,15 +26,25 @@ BEGIN {
         HINT="SOUND"
 
     if ( match($1, /Anime/) )
-        HINT="ANIME"
+        HINT="TV/ANIME"
 
-    # If we still have an Sxx (Season) tag at this point, assume it's a TV series
-    if ( match(FILE, /\.S[0-9]+\./) )
+    # If we still have an Sxx (Season) tag at this point, assume it's a TV series, also check for TV matches in nickname
+    if ( match(FILE, /\.S[0-9]+\./) || match($1, /[\-\|](TV|HDTV)[\-\|]/ ) )
         HINT="TV"
 
-    if ( HINT == "unknown" )
+    if ( HINT == "unknown" ) {
         if ( match(FILE, /(\.|-)(BluRay|X264|H264|HDRIP|BDRIP|DVDScr|XVID)(\.|-)/) != 0 || match(FILE, /mkv$/) )
             HINT="MOVIES"
+        # Last try, try to assign using their nickname / category. 
+        else if ( match($1, /[\-\|]APP[\-\|]/) )
+            HINT="APP"
+        else if ( match($1, /[\-\|]MUSIC[\-\|]/) )
+            HINT="sound"
+
+        # 'Movies' with a date tag should probably be TV...
+        if ( HINT == "MOVIES" && match(FILE, /\.[19-20][0-9]{2}\.[1-31]\.[1-31]\./) )
+            HINT="TV/test"
+    }
 
 
     csv="'"NETWORK"', '"CHANNEL"', '"$1"', '"$2"', '"$3"', '"$4"', '"HINT"', '"FILE"'"
