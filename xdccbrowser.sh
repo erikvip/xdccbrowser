@@ -37,7 +37,6 @@ splitline() {
 
 	local _sql="REPLACE INTO packs VALUES('${NETWORK}', '${CHANNEL}', '${_nick}', '${_number}', '${_requests}', '${_size}', '${_file}', '${_hint}', 'test' );";
 	#echo $_sql;
-	#echo $_sql >> fuck.sql
 	sqlite3 xdcc.sqlite3 "$_sql";
 
 }
