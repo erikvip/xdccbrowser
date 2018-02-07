@@ -15,11 +15,18 @@ BEGIN { print "'Network', 'Channel', 'Nick', 'Pack #', 'DLs', 'Size', 'Type', 'F
         HINT="XXX"
     if ( match(FILE, /EBOOK/) != 0 )
         HINT="EBOOK"
-    if ( match(FILE, /(Android|\.ISO|ISO\.)/) != 0 )
+    if ( match(FILE, /[\.\-](Android|ISO|Keygen|Linux|MacOSX[\.\-])/) != 0 )
         HINT="APP"
 
-    if ( match(FILE, /\.(MP3|VBR|2CD)\./) != 0 )
+    if ( match(FILE, /[\.\-](MP3|VBR|[2-9]CD|FLAC|Discography)[\.\-]/) != 0 )
         HINT="SOUND"
+
+    if ( match($1, /Anime/) )
+        HINT="ANIME"
+
+    # If we still have an Sxx (Season) tag at this point, assume it's a TV series
+    if ( match(FILE, /\.S[0-9]+\./) )
+        HINT="TV"
 
     if ( HINT == "unknown" )
         if ( match(FILE, /(\.|-)(BluRay|X264|H264|HDRIP|BDRIP|DVDScr|XVID)(\.|-)/) != 0 || match(FILE, /mkv$/) )
