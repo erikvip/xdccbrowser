@@ -26,7 +26,7 @@ export BASEPATH
 # Run the awk script once with no input, to output the row header. All subseqent calls will have SKIPHEADER set
 awk -f "${BASEPATH}/import.awk" < /dev/null
 
-find "${FILEDIR}" -maxdepth 1 -type f -iname 'channel_*.log' -exec bash -c 'process "$0"' {} \;
+find "${FILEDIR}" -maxdepth 1 -type f -ctime -5 -iname 'channel_*.log' -exec bash -c 'process "$0"' {} \;
 
 (>&2 echo )
 
