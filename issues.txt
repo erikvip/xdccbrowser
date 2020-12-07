@@ -1,0 +1,1 @@
+Brackets [] are removed from nicks and not carried into copy paste

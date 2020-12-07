@@ -1,7 +1,7 @@
 BEGIN { 
     # Only output header if skipheader is not set to 1
     if ( SKIPHEADER != 1 )
-        print "'Network', 'Channel', 'Nick', 'Pack #', 'DLs', 'Size', 'Type', 'File'" 
+        print "'Network', 'Channel', 'Nick', 'Pack #', 'DLs', 'Size', 'Type', 'File', 'Cmd'" 
 }
 {
     # 1 - nick
@@ -48,7 +48,7 @@ BEGIN {
     }
 
 
-    csv="'"NETWORK"', '"CHANNEL"', '"$1"', '"$2"', '"$3"', '"$4"', '"HINT"', '"FILE"'"
+    csv="'"NETWORK"', '"CHANNEL"', '"$1"', '"$2"', '"$3"', '"$4"', '"HINT"', '"FILE"',/MSG "$1" XDCC SEND #"$2""
     count++
     #print count
 
