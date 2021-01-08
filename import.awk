@@ -1,7 +1,7 @@
 BEGIN { 
     # Only output header if skipheader is not set to 1
     if ( SKIPHEADER != 1 )
-        print "'Network', 'Channel', 'Nick', 'Pack #', 'DLs', 'Size', 'Type', 'File', 'Cmd'" 
+        print "'Network', 'Channel', 'Nick', 'Pack #', 'DLs', 'Size', 'Type', 'File', 'Cmd', 'Subtype/Series'" 
 }
 {
     # 1 - nick
@@ -12,6 +12,7 @@ BEGIN {
     FILE=substr($0, index($0,$5))
     HINT="unknown"
     IGNORECASE = 1
+    SERIES=""
 
     if ( match(FILE, /\.S[0-9]*E[0-9]*\./) || match(FILE, /HDTV/) )
         HINT="TV"
@@ -47,8 +48,21 @@ BEGIN {
                 HINT="TV"
     }
 
+    if ( HINT == "TV" ) {
+        SERIES=gensub(/(.*)\.S[0-9]+.*$/, "\\1", "g", FILE)
 
-    csv="'"NETWORK"', '"CHANNEL"', '"$1"', '"$2"', '"$3"', '"$4"', '"HINT"', '"FILE"',/MSG "$1" XDCC SEND #"$2""
+        # If we parsed the whole filename exact, then just leave series blank
+        if ( SERIES == FILE ) 
+            SERIES=""
+
+        gsub(/\./, " ", SERIES)
+
+
+    }
+ 
+
+
+    csv="'"NETWORK"', '"CHANNEL"', '"$1"', '"$2"', '"$3"', '"$4"', '"HINT"', '"FILE"',/MSG "$1" XDCC SEND #"$2", '"SERIES"'"
     count++
     #print count
 
