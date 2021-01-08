@@ -1,0 +1,1 @@
+for f in $(find . -maxdepth 1 -type f); do ffmpeg-progress "${f}" -vcodec h264 -acodec mp3 -s 640x480 -b:v 512k -loglevel 16 -y -stats "${f}-resample.mp4"; r=$?; if [[ $r == 0 ]]; then echo "resampled $f"; fi; done;

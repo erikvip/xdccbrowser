@@ -1,0 +1,115 @@
+#!/bin/bash -e
+
+## @TODO Single quote escaping in the remote SSH command is fucking retarded and bandaid fixes with double quotes...a double quote in the filename will still break it
+
+DL_URL='http://PATH TO HTTP DIR';
+DL_REMOTE_PATH="sub/dir/to/remove";
+DL_SSH_HOST="user@hostname";
+DL_REMOTE_PATH_FINISHED="irc/done/fin/";
+DL_HISTORY="finished.dat";
+
+if [ ! -e "${DL_HISTORY}" ]; then
+	touch "${DL_HISTORY}";
+fi
+
+
+# Fetch the apache 'Index of /' and return a URL for each item, skipping table header links
+fetch_list() {
+	echo "Fetching file list..." >/dev/stderr
+	wget -q -O - 'http://PATH TO HTTP DIR...again for some reason...' | \
+		grep '<tr><td' | \
+		grep -v 'folder.gif' | \
+		egrep -o 'href="[^"]*' | \
+		cut -d'"' -f2 | \
+		grep -v '/irc/' | \
+		sed 's#^#http://PATH TO HTTP DIR regex thingamabob/#g'
+}
+
+query=${1:-};
+
+
+main () {
+	for u in $( fetch_list ); do 
+		file=$(basename "$u");
+#		file="${file//\'/\\\'}"
+		if [[ "$query" != "" ]]; then
+			if [[ ! "$u" =~ $query ]]; then
+				echo "${bold}Skipping${normal} $file as it does not match ${underline}$query${end_underline}";
+				continue;
+			fi
+			echo "Match on $u"; 
+		fi
+
+		if [[ `grep -c "$file" finished.dat` != 0 ]]; then
+			echo "${bold}Skipping${normal} $u as its already in the finished.dat file";
+			continue;
+		fi
+
+		echo "${bold}Downloading $u${normal}"; echo;
+		aria2c -c "$u"; 
+		r=$?;
+		if [[ "$r" == 0 ]]; then
+			# Download success
+			file=$(echo $file | urldecode);
+			echo "Download finished for ${file}. Verifying checksums...";
+			remote_cksum=$(ssh "${DL_SSH_HOST}" "cksum \"${DL_REMOTE_PATH}${file}\"" | cut -d " " -f1,2 | tr -d "\n");
+			local_cksum=$(cksum "${file}" | cut -d " " -f1,2 | tr -d "\n");
+
+
+			if [[ "${remote_cksum}" != "${local_cksum}" ]]; then
+				echo; echo "${red}ERROR: Checksums do not match for $u${normal}"; echo
+				exit 1;
+			fi
+			echo "${bold}Success. Moving remote ${file} to ${DL_REMOTE_PATH_FINISHED}";
+
+#			ssh ${DL_SSH_HOST} "mv '${DL_REMOTE_PATH}${file}' ${DL_REMOTE_PATH_FINISHED}";
+			ssh ${DL_SSH_HOST} "mv \"${DL_REMOTE_PATH}${file}\" ${DL_REMOTE_PATH_FINISHED}";
+
+			echo "Return $?"
+			echo -e "${u}\t${remote_cksum}" >> finished.dat
+
+		fi;
+	
+	done
+}
+
+
+
+
+# Color helpers
+normal=$(tput sgr0);
+
+# Standard color set
+black=$(tput setaf 0);
+red=$(tput setaf 1);
+green=$(tput setaf 2);
+yellow=$(tput setaf 3);
+blue=$(tput setaf 4);
+magenta=$(tput setaf 5);
+cyan=$(tput setaf 6);
+white=$(tput setaf 7);
+
+# Extended ANSI colors
+light_red=$(echo -e "\033[1;31m")
+light_green=$(echo -e "\033[1;32m")
+light_yellow=$(echo -e "\033[1;33m")
+light_blue=$(echo -e "\033[1;34m")
+light_magenta=$(echo -e "\033[1;35m")
+light_cyan=$(echo -e "\033[1;36m")
+
+# Text effects
+bold=$(tput bold);
+underline=$(tput smul);
+end_underline=$(tput rmul);
+blink=$(tput blink);
+standout=$(tput smso);
+end_standout=$(tput rmso);
+
+# Cursor Positioning
+#cursor_up="\033[1A";
+cursor_up=$(tput cuu1);
+cursor_down=$(tput cud1);
+
+
+main
+
